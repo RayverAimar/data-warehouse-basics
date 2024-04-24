@@ -1,0 +1,32 @@
+version: "3.8"
+
+services:
+  
+  postgres:
+    image: postgres:latest
+    container_name: postgresql_db
+    restart: always
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    volumes:
+      - bi_volume:/var/lib/postgresql/data
+      - ./sql/create_schema.sql:/docker-entrypoint-initdb.d/create_schema.sql
+      - ./sql/data.sql:/docker-entrypoint-initdb.d/data.sql
+      - ./sql/functions.sql:/docker-entrypoint-initdb.d/functions.sql
+
+  pgadmin:
+    image: dpage/pgadmin4
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD}
+    ports:
+      - "80:80"
+    depends_on:
+      - postgres
+
+volumes:
+  bi_volume:
